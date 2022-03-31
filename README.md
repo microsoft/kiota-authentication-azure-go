@@ -1,14 +1,23 @@
-# Project
+# Kiota Azure Identity authentication provider library for go
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+![Go](https://github.com/microsoft/kiota-authentication-azure-go/actions/workflows/go.yml/badge.svg)
 
-As the maintainer of this project, please make a few updates:
+The Kiota Azure Identity authentication provider library for go is the authentication provider implementation with [Azure.Identity](https://github.com/azure/azure-sdk-for-go).
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a authentication provider library to authenticate HTTP requests to an API endpoint.
+
+Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
+
+## Using Azure Identity authentication provider library for go
+
+```Shell
+go get github.com/microsoft/kiota-authentication-azure-go
+```
+
+```Golang
+cred, err := azidentity.NewDeviceCodeCredential(nil)
+authProvider, err := kiotaazure.NewAzureIdentityAuthenticationProviderWithScopes(cred, []string{"User.Read"})
+```
 
 ## Contributing
 
