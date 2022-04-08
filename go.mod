@@ -3,13 +3,12 @@ module github.com/microsoft/kiota-authentication-azure-go
 go 1.17
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.22.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.23.0
 	github.com/microsoft/kiota-abstractions-go v0.3.0
 	github.com/stretchr/testify v1.7.1
 )
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/internal v0.9.1 // indirect
 	github.com/cjlapao/common-go v0.0.19 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/uuid v1.3.0 // indirect
