@@ -4,7 +4,7 @@
 
 The Kiota Azure Identity authentication provider library for go is the authentication provider implementation with [Azure.Identity](https://github.com/azure/azure-sdk-for-go).
 
-A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to a authentication provider library to authenticate HTTP requests to an API endpoint.
+A [Kiota](https://github.com/microsoft/kiota) generated project will need a reference to an authentication provider library to authenticate HTTP requests to an API endpoint.
 
 Read more about Kiota [here](https://github.com/microsoft/kiota/blob/main/README.md).
 
