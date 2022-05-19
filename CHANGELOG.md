@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [0.3.0] - 2022-05-18
+
+### Added
+
+- Added preliminary work to support continuous access evaluation.
+
 ## [0.2.1] - 2022-04-19
 
 ### Changed

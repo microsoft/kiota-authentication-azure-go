@@ -2,6 +2,7 @@ package microsoft_kiota_authentication_azure
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"strings"
 
@@ -54,16 +55,34 @@ func NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential azcor
 	return result, nil
 }
 
+const claimsKey = "claims"
+
 // GetAuthorizationToken returns the access token for the provided url.
-func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(url *u.URL) (string, error) {
+func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(url *u.URL, additionalAuthenticationContext map[string]interface{}) (string, error) {
 	if !(*(p.allowedHostsValidator)).IsUrlHostValid(url) {
 		return "", nil
 	}
 	if !strings.EqualFold(url.Scheme, "https") {
 		return "", errors.New("url scheme must be https")
 	}
+
+	claims := ""
+
+	if additionalAuthenticationContext != nil &&
+		additionalAuthenticationContext[claimsKey] != nil {
+		if rawClaims, ok := additionalAuthenticationContext[claimsKey].(string); ok {
+			decodedClaims, err := base64.StdEncoding.DecodeString(rawClaims)
+			if err != nil {
+				return "", err
+			}
+			claims = string(decodedClaims)
+			return "", errors.New("received a claim for CAE but azure identity doesn't support claims: " + claims + " https://github.com/Azure/azure-sdk-for-go/issues/14284")
+		}
+	}
+
 	options := azpolicy.TokenRequestOptions{
 		Scopes: p.scopes,
+		//TODO pass the claims once the API is updated to support it https://github.com/Azure/azure-sdk-for-go/issues/14284
 	}
 	token, err := p.credential.GetToken(context.Background(), options)
 	if err != nil {
