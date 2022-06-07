@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## [0.3.1] - 2022-06-07
+
+### Changed
+
+- Upgraded abstractions and yaml dependencies.
+
 ## [0.3.0] - 2022-05-18
 
 ### Added
