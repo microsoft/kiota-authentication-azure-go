@@ -1,5 +1,5 @@
-github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.1 h1:tz19qLF65vuu2ibfTqGVJxG/zZAI27NEIIbvAOQwYbw=
-github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.1/go.mod h1:uGG2W01BaETf0Ozp+QxxKJdMBNRWPdstHG0Fmdwn1/U=
+github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.2 h1:lneMk5qtUMulXa/eVxjVd+/bDYMEDIqYpLzLa2/EsNI=
+github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.2/go.mod h1:uGG2W01BaETf0Ozp+QxxKJdMBNRWPdstHG0Fmdwn1/U=
 github.com/Azure/azure-sdk-for-go/sdk/internal v1.0.0 h1:jp0dGvZ7ZK0mgqnTSClMxa5xuRL7NZgHameVYF6BurY=
 github.com/cjlapao/common-go v0.0.20 h1:AIZBtuxwJPXFqyxFOlvVDWZgbsuTSquZEUw4KMx8pNg=
 github.com/cjlapao/common-go v0.0.20/go.mod h1:EVLEXIxsBHblPMrhJYOvL4yBCcBj7IYDdW88VlfxpPM=
