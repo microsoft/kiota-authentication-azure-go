@@ -58,7 +58,7 @@ func NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential azcor
 const claimsKey = "claims"
 
 // GetAuthorizationToken returns the access token for the provided url.
-func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(url *u.URL, additionalAuthenticationContext map[string]interface{}) (string, error) {
+func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Context, url *u.URL, additionalAuthenticationContext map[string]interface{}) (string, error) {
 	if !(*(p.allowedHostsValidator)).IsUrlHostValid(url) {
 		return "", nil
 	}
@@ -84,7 +84,7 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(url *u.URL, add
 		Scopes: p.scopes,
 		//TODO pass the claims once the API is updated to support it https://github.com/Azure/azure-sdk-for-go/issues/14284
 	}
-	token, err := p.credential.GetToken(context.Background(), options)
+	token, err := p.credential.GetToken(ctx, options)
 	if err != nil {
 		return "", err
 	}

@@ -25,7 +25,7 @@ func TestAddsTokenOnValidHost(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, provider)
 
-	token, err := provider.GetAuthorizationToken(&u.URL{Host: "graph.microsoft.com", Scheme: "https"}, nil)
+	token, err := provider.GetAuthorizationToken(context.Background(), &u.URL{Host: "graph.microsoft.com", Scheme: "https"}, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, "token", token)
 }
@@ -38,7 +38,7 @@ func TestAddsTokenOnValidHostFromParse(t *testing.T) {
 	url, err := u.Parse("https://graph.microsoft.com")
 	assert.Nil(t, err)
 
-	token, err := provider.GetAuthorizationToken(url, nil)
+	token, err := provider.GetAuthorizationToken(context.Background(), url, nil)
 	assert.Nil(t, err)
 	assert.Equal(t, "token", token)
 }
@@ -48,7 +48,7 @@ func TestDoesntAddTokenOnDifferentHost(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, provider)
 
-	token, err := provider.GetAuthorizationToken(&u.URL{Host: "differenthost.com"}, nil)
+	token, err := provider.GetAuthorizationToken(context.Background(), &u.URL{Host: "differenthost.com"}, nil)
 	assert.Nil(t, err)
 	assert.Empty(t, token)
 }
@@ -58,7 +58,7 @@ func TestDoesntAddTokenOnHttp(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, provider)
 
-	token, err := provider.GetAuthorizationToken(&u.URL{Host: "differenthost.com", Scheme: "http"}, nil)
+	token, err := provider.GetAuthorizationToken(context.Background(), &u.URL{Host: "differenthost.com", Scheme: "http"}, nil)
 	assert.Nil(t, err)
 	assert.Empty(t, token)
 }
@@ -73,7 +73,7 @@ func TestAddsClaimsToTokenRequest(t *testing.T) {
 
 	additionalContext := make(map[string]interface{})
 	additionalContext["claims"] = "eyJhY2Nlc3NfdG9rZW4iOnsibmJmIjp7ImVzc2VudGlhbCI6dHJ1ZSwgInZhbHVlIjoiMTY1MjgxMzUwOCJ9fX0="
-	token, err := provider.GetAuthorizationToken(url, additionalContext)
+	token, err := provider.GetAuthorizationToken(context.Background(), url, additionalContext)
 	assert.NotNil(t, err) //TODO update when azure identity has added the field
 	assert.Empty(t, token)
 }
