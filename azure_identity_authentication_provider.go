@@ -23,11 +23,17 @@ func NewAzureIdentityAuthenticationProviderWithScopes(credential azcore.TokenCre
 }
 
 // NewAzureIdentityAuthenticationProviderWithScopesAndValidHosts creates a new instance of the AzureIdentityAuthenticationProvider.
-func NewAzureIdentityAuthenticationProviderWithScopesAndValidHosts(credential azcore.TokenCredential, scopes []string, validhosts []string) (*AzureIdentityAuthenticationProvider, error) {
-	accessTokenProvider, err := NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential, scopes, validhosts)
+func NewAzureIdentityAuthenticationProviderWithScopesAndValidHosts(credential azcore.TokenCredential, scopes []string, validHosts []string) (*AzureIdentityAuthenticationProvider, error) {
+	return NewAzureIdentityAuthenticationProviderWithScopesAndValidHostsAndObservabilityName(credential, scopes, validHosts, "")
+}
+
+// NewAzureIdentityAuthenticationProviderWithScopesAndValidHostsAndObservabilityName creates a new instance of the AzureIdentityAuthenticationProvider.
+func NewAzureIdentityAuthenticationProviderWithScopesAndValidHostsAndObservabilityName(credential azcore.TokenCredential, scopes []string, validHosts []string, observabilityName string) (*AzureIdentityAuthenticationProvider, error) {
+	accessTokenProvider, err := NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential, scopes, validHosts)
 	if err != nil {
 		return nil, err
 	}
+	accessTokenProvider.observabilityName = observabilityName
 	baseBearer := auth.NewBaseBearerTokenAuthenticationProvider(accessTokenProvider)
 	result := &AzureIdentityAuthenticationProvider{
 		BaseBearerTokenAuthenticationProvider: *baseBearer,

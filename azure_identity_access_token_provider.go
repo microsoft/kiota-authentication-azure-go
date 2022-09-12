@@ -11,6 +11,8 @@ import (
 	azcore "github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	azpolicy "github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	absauth "github.com/microsoft/kiota-abstractions-go/authentication"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 )
 
 // AzureIdentityAccessTokenProvider implementation of AccessTokenProvider that supports implementations of TokenCredential from Azure.Identity.
@@ -18,6 +20,7 @@ type AzureIdentityAccessTokenProvider struct {
 	scopes                []string
 	credential            azcore.TokenCredential
 	allowedHostsValidator *absauth.AllowedHostsValidator
+	observabilityName     string
 }
 
 // NewAzureIdentityAccessTokenProvider creates a new instance of the AzureIdentityAccessTokenProvider using "https://graph.microsoft.com/.default" as the default scope.
@@ -56,15 +59,25 @@ func NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential azcor
 }
 
 const claimsKey = "claims"
+const DefaultObservabilityName = "kiota-azure-identity-provider"
 
 // GetAuthorizationToken returns the access token for the provided url.
 func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Context, url *u.URL, additionalAuthenticationContext map[string]interface{}) (string, error) {
+	observabilityName := p.observabilityName
+	if observabilityName == "" {
+		observabilityName = DefaultObservabilityName
+	}
+	ctx, span := otel.GetTracerProvider().Tracer(observabilityName).Start(ctx, "GetAuthorizationToken")
+	defer span.End()
 	if !(*(p.allowedHostsValidator)).IsUrlHostValid(url) {
+		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", false))
 		return "", nil
 	}
 	if !strings.EqualFold(url.Scheme, "https") {
+		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", false))
 		return "", errors.New("url scheme must be https")
 	}
+	span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", true))
 
 	claims := ""
 
@@ -79,11 +92,17 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 			return "", errors.New("received a claim for CAE but azure identity doesn't support claims: " + claims + " https://github.com/Azure/azure-sdk-for-go/issues/14284")
 		}
 	}
+	if claims == "" {
+		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.additional_claims_provided", true))
+	} else {
+		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.additional_claims_provided", false))
+	}
 
 	options := azpolicy.TokenRequestOptions{
 		Scopes: p.scopes,
 		//TODO pass the claims once the API is updated to support it https://github.com/Azure/azure-sdk-for-go/issues/14284
 	}
+	span.SetAttributes(attribute.String("com.microsoft.kiota.authentication.scopes", strings.Join(p.scopes, ",")))
 	token, err := p.credential.GetToken(ctx, options)
 	if err != nil {
 		return "", err
