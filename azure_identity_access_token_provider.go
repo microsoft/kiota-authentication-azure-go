@@ -20,7 +20,14 @@ type AzureIdentityAccessTokenProvider struct {
 	scopes                []string
 	credential            azcore.TokenCredential
 	allowedHostsValidator *absauth.AllowedHostsValidator
-	observabilityName     string
+	// The observation options for the request adapter.
+	observabilityOptions ObservabilityOptions
+}
+
+// ObservabilityOptions holds the tracing, metrics and logging configuration for the request adapter
+type ObservabilityOptions struct {
+	// The name of the tracer
+	TracerInstrumentationName string
 }
 
 // NewAzureIdentityAccessTokenProvider creates a new instance of the AzureIdentityAccessTokenProvider using "https://graph.microsoft.com/.default" as the default scope.
@@ -33,8 +40,13 @@ func NewAzureIdentityAccessTokenProviderWithScopes(credential azcore.TokenCreden
 	return NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential, scopes, nil)
 }
 
-// NewAzureIdentityAccessTokenProviderWithScopesAndValidhosts creates a new instance of the AzureIdentityAccessTokenProvider.
-func NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential azcore.TokenCredential, scopes []string, validhosts []string) (*AzureIdentityAccessTokenProvider, error) {
+// NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts creates a new instance of the AzureIdentityAccessTokenProvider.
+func NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential azcore.TokenCredential, scopes []string, validHosts []string) (*AzureIdentityAccessTokenProvider, error) {
+	return NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityOptions(credential, scopes, validHosts, ObservabilityOptions{})
+}
+
+// NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts creates a new instance of the AzureIdentityAccessTokenProvider.
+func NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityOptions(credential azcore.TokenCredential, scopes []string, validHosts []string, observabilityOptions ObservabilityOptions) (*AzureIdentityAccessTokenProvider, error) {
 	if credential == nil {
 		return nil, errors.New("credential cannot be nil")
 	}
@@ -45,14 +57,15 @@ func NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential azcor
 	} else {
 		copy(finalScopes, scopes)
 	}
-	validator := absauth.NewAllowedHostsValidator(validhosts)
-	if len(validhosts) == 0 {
+	validator := absauth.NewAllowedHostsValidator(validHosts)
+	if len(validHosts) == 0 {
 		validator = absauth.NewAllowedHostsValidator([]string{"graph.microsoft.com", "graph.microsoft.us", "dod-graph.microsoft.us", "graph.microsoft.de", "microsoftgraph.chinacloudapi.cn", "canary.graph.microsoft.com"})
 	}
 	result := &AzureIdentityAccessTokenProvider{
 		credential:            credential,
 		scopes:                finalScopes,
 		allowedHostsValidator: &validator,
+		observabilityOptions:  observabilityOptions,
 	}
 
 	return result, nil
@@ -63,7 +76,7 @@ const DefaultObservabilityName = "kiota-azure-identity-provider"
 
 // GetAuthorizationToken returns the access token for the provided url.
 func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Context, url *u.URL, additionalAuthenticationContext map[string]interface{}) (string, error) {
-	observabilityName := p.observabilityName
+	observabilityName := p.observabilityOptions.TracerInstrumentationName
 	if observabilityName == "" {
 		observabilityName = DefaultObservabilityName
 	}
@@ -75,7 +88,9 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 	}
 	if !strings.EqualFold(url.Scheme, "https") {
 		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", false))
-		return "", errors.New("url scheme must be https")
+		err := errors.New("url scheme must be https")
+		span.RecordError(err)
+		return "", err
 	}
 	span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", true))
 
@@ -86,10 +101,13 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 		if rawClaims, ok := additionalAuthenticationContext[claimsKey].(string); ok {
 			decodedClaims, err := base64.StdEncoding.DecodeString(rawClaims)
 			if err != nil {
+				span.RecordError(err)
 				return "", err
 			}
 			claims = string(decodedClaims)
-			return "", errors.New("received a claim for CAE but azure identity doesn't support claims: " + claims + " https://github.com/Azure/azure-sdk-for-go/issues/14284")
+			err = errors.New("received a claim for CAE but azure identity doesn't support claims: " + claims + " https://github.com/Azure/azure-sdk-for-go/issues/14284")
+			span.RecordError(err)
+			return "", err
 		}
 	}
 	if claims == "" {
@@ -105,6 +123,7 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 	span.SetAttributes(attribute.String("com.microsoft.kiota.authentication.scopes", strings.Join(p.scopes, ",")))
 	token, err := p.credential.GetToken(ctx, options)
 	if err != nil {
+		span.RecordError(err)
 		return "", err
 	}
 	return token.Token, nil
