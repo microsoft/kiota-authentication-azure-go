@@ -26,8 +26,10 @@ type AzureIdentityAccessTokenProvider struct {
 
 // ObservabilityOptions holds the tracing, metrics and logging configuration for the request adapter
 type ObservabilityOptions struct {
-	// The name of the tracer
-	TracerInstrumentationName string
+}
+
+func (o ObservabilityOptions) GetTracerInstrumentationName() string {
+	return "github.com/microsoft/kiota-authentication-azure-go"
 }
 
 // NewAzureIdentityAccessTokenProvider creates a new instance of the AzureIdentityAccessTokenProvider using "https://graph.microsoft.com/.default" as the default scope.
@@ -72,15 +74,10 @@ func NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityO
 }
 
 const claimsKey = "claims"
-const DefaultObservabilityName = "kiota-azure-identity-provider"
 
 // GetAuthorizationToken returns the access token for the provided url.
 func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Context, url *u.URL, additionalAuthenticationContext map[string]interface{}) (string, error) {
-	observabilityName := p.observabilityOptions.TracerInstrumentationName
-	if observabilityName == "" {
-		observabilityName = DefaultObservabilityName
-	}
-	ctx, span := otel.GetTracerProvider().Tracer(observabilityName).Start(ctx, "GetAuthorizationToken")
+	ctx, span := otel.GetTracerProvider().Tracer(p.observabilityOptions.GetTracerInstrumentationName()).Start(ctx, "GetAuthorizationToken")
 	defer span.End()
 	if !(*(p.allowedHostsValidator)).IsUrlHostValid(url) {
 		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", false))
