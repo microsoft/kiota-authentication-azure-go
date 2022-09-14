@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.3
-	github.com/microsoft/kiota-abstractions-go v0.10.0
+	github.com/microsoft/kiota-abstractions-go v0.10.1
 	github.com/stretchr/testify v1.8.0
 )
 
