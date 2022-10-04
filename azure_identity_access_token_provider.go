@@ -107,11 +107,8 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 			return "", err
 		}
 	}
-	if claims == "" {
-		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.additional_claims_provided", false))
-	} else {
-		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.additional_claims_provided", true))
-	}
+	span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.additional_claims_provided", claims != ""))
+
 
 	options := azpolicy.TokenRequestOptions{
 		Scopes: p.scopes,
