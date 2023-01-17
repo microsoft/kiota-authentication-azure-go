@@ -32,7 +32,7 @@ func (o ObservabilityOptions) GetTracerInstrumentationName() string {
 	return "github.com/microsoft/kiota-authentication-azure-go"
 }
 
-// NewAzureIdentityAccessTokenProvider creates a new instance of the AzureIdentityAccessTokenProvider using "https://graph.microsoft.com/.default" as the default scope.
+// NewAzureIdentityAccessTokenProvider creates a new instance of the AzureIdentityAccessTokenProvider using "<scheme>://<host>/.default" as the default scope.
 func NewAzureIdentityAccessTokenProvider(credential azcore.TokenCredential) (*AzureIdentityAccessTokenProvider, error) {
 	return NewAzureIdentityAccessTokenProviderWithScopes(credential, nil)
 }
