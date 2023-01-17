@@ -44,11 +44,11 @@ func TestAddsTokenOnValidHostFromParse(t *testing.T) {
 }
 
 func TestDoesntAddTokenOnDifferentHost(t *testing.T) {
-	provider, err := NewAzureIdentityAccessTokenProvider(&MockTokenCredential{TokenValue: "token"})
+	provider, err := NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(&MockTokenCredential{TokenValue: "token"}, []string{}, []string{"graph.microsoft.com"})
 	assert.Nil(t, err)
 	assert.NotNil(t, provider)
 
-	token, err := provider.GetAuthorizationToken(context.Background(), &u.URL{Host: "differenthost.com"}, nil)
+	token, err := provider.GetAuthorizationToken(context.Background(), &u.URL{Host: "differenthost.com", Scheme: "https"}, nil)
 	assert.Nil(t, err)
 	assert.Empty(t, token)
 }
@@ -59,7 +59,7 @@ func TestDoesntAddTokenOnHttp(t *testing.T) {
 	assert.NotNil(t, provider)
 
 	token, err := provider.GetAuthorizationToken(context.Background(), &u.URL{Host: "differenthost.com", Scheme: "http"}, nil)
-	assert.Nil(t, err)
+	assert.NotNil(t, err)
 	assert.Empty(t, token)
 }
 
