@@ -4,14 +4,14 @@ go 1.18
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.4.0
-	github.com/microsoft/kiota-abstractions-go v0.17.2
+	github.com/microsoft/kiota-abstractions-go v0.17.3
 	github.com/stretchr/testify v1.8.2
 	go.opentelemetry.io/otel v1.14.0
 )
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.1.2 // indirect
-	github.com/cjlapao/common-go v0.0.37 // indirect
+	github.com/cjlapao/common-go v0.0.39 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
