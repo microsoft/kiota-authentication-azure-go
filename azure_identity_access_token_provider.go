@@ -78,7 +78,7 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", false))
 		return "", nil
 	}
-	if !strings.EqualFold(url.Scheme, "https") {
+	if !strings.EqualFold(url.Scheme, "https") && !isLocalhost(url.Host) {
 		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", false))
 		err := errors.New("url scheme must be https")
 		span.RecordError(err)
@@ -124,4 +124,18 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 // GetAllowedHostsValidator returns the hosts validator.
 func (p *AzureIdentityAccessTokenProvider) GetAllowedHostsValidator() *absauth.AllowedHostsValidator {
 	return p.allowedHostsValidator
+}
+
+func isLocalhost(host string) bool {
+	if strings.HasPrefix(host, "localhost") {
+		remainder := strings.TrimPrefix(host, "localhost")
+		return remainder == "" || strings.HasPrefix(remainder, ":")
+	}
+
+	if strings.HasPrefix(host, "127.0.0.1") {
+		remainder := strings.TrimPrefix(host, "127.0.0.1")
+		return remainder == "" || strings.HasPrefix(remainder, ":")
+	}
+
+	return false
 }
