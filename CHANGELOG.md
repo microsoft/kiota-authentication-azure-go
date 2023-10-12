@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+## [1.0.1] - 2023-10-13
+
+### Changed
+
+- Allow http on localhost.
+
 ## [1.0.0] - 2023-05-04
 
 ### Changed

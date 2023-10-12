@@ -28,6 +28,12 @@ type AzureIdentityAccessTokenProvider struct {
 type ObservabilityOptions struct {
 }
 
+const (
+	Localhost     = "localhost"
+	LocalhostIPv6 = "[::1]"
+	LocalhostIPv4 = "127.0.0.1"
+)
+
 func (o ObservabilityOptions) GetTracerInstrumentationName() string {
 	return "github.com/microsoft/kiota-authentication-azure-go"
 }
@@ -127,15 +133,22 @@ func (p *AzureIdentityAccessTokenProvider) GetAllowedHostsValidator() *absauth.A
 }
 
 func isLocalhost(host string) bool {
-	if strings.HasPrefix(host, "localhost") {
-		remainder := strings.TrimPrefix(host, "localhost")
-		return remainder == "" || strings.HasPrefix(remainder, ":")
+	normalizedHost := strings.ToLower(host)
+	if strings.HasPrefix(normalizedHost, Localhost) {
+		return isValidRemainder(strings.TrimPrefix(normalizedHost, Localhost))
 	}
 
-	if strings.HasPrefix(host, "127.0.0.1") {
-		remainder := strings.TrimPrefix(host, "127.0.0.1")
-		return remainder == "" || strings.HasPrefix(remainder, ":")
+	if strings.HasPrefix(normalizedHost, LocalhostIPv4) {
+		return isValidRemainder(strings.TrimPrefix(normalizedHost, LocalhostIPv4))
+	}
+
+	if strings.HasPrefix(normalizedHost, LocalhostIPv6) {
+		return isValidRemainder(strings.TrimPrefix(normalizedHost, LocalhostIPv6))
 	}
 
 	return false
+}
+
+func isValidRemainder(remainder string) bool {
+	return remainder == "" || strings.HasPrefix(remainder, ":")
 }
