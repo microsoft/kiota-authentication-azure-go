@@ -28,7 +28,7 @@ type AzureIdentityAccessTokenProvider struct {
 type ObservabilityOptions struct {
 }
 
-var LocalhostStrings = [3]string{"localhost", "[::1]", "::1", "127.0.0.1"}
+var LocalhostStrings = [4]string{"localhost", "[::1]", "::1", "127.0.0.1"}
 
 func (o ObservabilityOptions) GetTracerInstrumentationName() string {
 	return "github.com/microsoft/kiota-authentication-azure-go"
