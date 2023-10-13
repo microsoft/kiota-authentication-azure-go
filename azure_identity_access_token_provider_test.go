@@ -64,9 +64,7 @@ func TestDoesntAddTokenOnHttp(t *testing.T) {
 }
 
 func TestAddsTokenOnHttpLocalhost(t *testing.T) {
-	localHostStrings := []string{Localhost, LocalhostIPv4, LocalhostIPv6}
-
-	for _, host := range localHostStrings {
+	for _, host := range LocalhostStrings {
 		provider, err := NewAzureIdentityAccessTokenProvider(&MockTokenCredential{TokenValue: "token"})
 		assert.Nil(t, err)
 		assert.NotNil(t, provider)
