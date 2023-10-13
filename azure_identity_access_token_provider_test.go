@@ -63,6 +63,18 @@ func TestDoesntAddTokenOnHttp(t *testing.T) {
 	assert.Empty(t, token)
 }
 
+func TestAddsTokenOnHttpLocalhost(t *testing.T) {
+	for _, host := range LocalhostStrings {
+		provider, err := NewAzureIdentityAccessTokenProvider(&MockTokenCredential{TokenValue: "token"})
+		assert.Nil(t, err)
+		assert.NotNil(t, provider)
+
+		token, err := provider.GetAuthorizationToken(context.Background(), &u.URL{Host: host, Scheme: "http"}, nil)
+		assert.Nil(t, err)
+		assert.Equal(t, "token", token)
+	}
+}
+
 func TestAddsClaimsToTokenRequest(t *testing.T) {
 	provider, err := NewAzureIdentityAccessTokenProvider(&MockTokenCredential{TokenValue: "token"})
 	assert.Nil(t, err)

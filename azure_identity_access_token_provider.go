@@ -28,6 +28,8 @@ type AzureIdentityAccessTokenProvider struct {
 type ObservabilityOptions struct {
 }
 
+var LocalhostStrings = [4]string{"localhost", "[::1]", "::1", "127.0.0.1"}
+
 func (o ObservabilityOptions) GetTracerInstrumentationName() string {
 	return "github.com/microsoft/kiota-authentication-azure-go"
 }
@@ -78,7 +80,7 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", false))
 		return "", nil
 	}
-	if !strings.EqualFold(url.Scheme, "https") {
+	if !strings.EqualFold(url.Scheme, "https") && !isLocalhost(url.Host) {
 		span.SetAttributes(attribute.Bool("com.microsoft.kiota.authentication.is_url_valid", false))
 		err := errors.New("url scheme must be https")
 		span.RecordError(err)
@@ -124,4 +126,19 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 // GetAllowedHostsValidator returns the hosts validator.
 func (p *AzureIdentityAccessTokenProvider) GetAllowedHostsValidator() *absauth.AllowedHostsValidator {
 	return p.allowedHostsValidator
+}
+
+func isLocalhost(host string) bool {
+	normalizedHost := strings.ToLower(host)
+	for _, localhostString := range LocalhostStrings {
+		if strings.HasPrefix(normalizedHost, localhostString) {
+			return isValidRemainder(strings.TrimPrefix(normalizedHost, localhostString))
+		}
+	}
+
+	return false
+}
+
+func isValidRemainder(remainder string) bool {
+	return remainder == "" || strings.HasPrefix(remainder, ":")
 }
