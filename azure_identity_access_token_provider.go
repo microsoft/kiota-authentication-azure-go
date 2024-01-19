@@ -59,15 +59,16 @@ func NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityO
 	if scopesLen > 0 {
 		copy(finalScopes, scopes)
 	}
-	validator := absauth.NewAllowedHostsValidator(validHosts)
-	result := &AzureIdentityAccessTokenProvider{
+	validator, err := absauth.NewAllowedHostsValidatorErrorCheck(validHosts)
+	if err != nil {
+		return nil, err
+	}
+	return &AzureIdentityAccessTokenProvider{
 		credential:            credential,
 		scopes:                finalScopes,
-		allowedHostsValidator: &validator,
+		allowedHostsValidator: validator,
 		observabilityOptions:  observabilityOptions,
-	}
-
-	return result, nil
+	}, nil
 }
 
 const claimsKey = "claims"
