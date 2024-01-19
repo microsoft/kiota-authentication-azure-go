@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Support the latest github.com/microsoft/kiota-abstractions-go.
+- Validates that provided valid hosts don't start with a scheme.
 
 ## [1.0.1] - 2023-10-13
 
