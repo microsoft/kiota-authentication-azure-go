@@ -3,7 +3,7 @@ module github.com/microsoft/kiota-authentication-azure-go
 go 1.18
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.11.0
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.11.1
 	github.com/microsoft/kiota-abstractions-go v1.6.0
 	github.com/stretchr/testify v1.9.0
 	go.opentelemetry.io/otel v1.24.0
