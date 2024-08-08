@@ -22,6 +22,7 @@ type AzureIdentityAccessTokenProvider struct {
 	allowedHostsValidator *absauth.AllowedHostsValidator
 	// The observation options for the request adapter.
 	observabilityOptions ObservabilityOptions
+	isCaeEnabled 		bool
 }
 
 // ObservabilityOptions holds the tracing, metrics and logging configuration for the request adapter
@@ -51,6 +52,11 @@ func NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts(credential azcor
 
 // NewAzureIdentityAccessTokenProviderWithScopesAndValidHosts creates a new instance of the AzureIdentityAccessTokenProvider.
 func NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityOptions(credential azcore.TokenCredential, scopes []string, validHosts []string, observabilityOptions ObservabilityOptions) (*AzureIdentityAccessTokenProvider, error) {
+	return NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityOptionsAndIsCaeEnabled(credential, scopes, validHosts, observabilityOptions, true)
+}
+
+// NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityOptionsAndIsCaeEnabled creates a new instance of the AzureIdentityAccessTokenProvider.
+func NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityOptionsAndIsCaeEnabled(credential azcore.TokenCredential, scopes []string, validHosts []string, observabilityOptions ObservabilityOptions, isCaeEnabled bool) (*AzureIdentityAccessTokenProvider, error) {
 	if credential == nil {
 		return nil, errors.New("credential cannot be nil")
 	}
@@ -68,6 +74,7 @@ func NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityO
 		scopes:                finalScopes,
 		allowedHostsValidator: validator,
 		observabilityOptions:  observabilityOptions,
+		isCaeEnabled: isCaeEnabled,
 	}, nil
 }
 
@@ -113,7 +120,7 @@ func (p *AzureIdentityAccessTokenProvider) GetAuthorizationToken(ctx context.Con
 
 	options := azpolicy.TokenRequestOptions{
 		Scopes: p.scopes,
-		//TODO pass the claims once the API is updated to support it https://github.com/Azure/azure-sdk-for-go/issues/14284
+		EnableCAE: p.isCaeEnabled,
 	}
 	span.SetAttributes(attribute.String("com.microsoft.kiota.authentication.scopes", strings.Join(p.scopes, ",")))
 	token, err := p.credential.GetToken(ctx, options)
