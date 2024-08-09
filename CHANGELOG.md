@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+## [1.1.0] - 2024-08-08
+
+### Changed
+
+- Continuous Access Evaluation is now enabled by default.
+
 ## [1.0.2] - 2024-01-19
 
 ### Changed
