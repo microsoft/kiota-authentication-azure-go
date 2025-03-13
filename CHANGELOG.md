@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0](https://github.com/microsoft/kiota-authentication-azure-go/compare/v1.1.0...v1.2.0) (2025-03-13)
+
+
+### Features
+
+* upgrades required go version from go1.18 to go 1.22 ([35f8bd7](https://github.com/microsoft/kiota-authentication-azure-go/commit/35f8bd73366e25d6ba19b2e2a19056a2baae0356))
+
 ## [1.1.0] - 2024-08-08
 
 ### Changed
