@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.1](https://github.com/microsoft/kiota-authentication-azure-go/compare/v1.2.0...v1.2.1) (2025-03-24)
+
+
+### Bug Fixes
+
+* upgrades common go dependency to solve triming issues ([5ab48d3](https://github.com/microsoft/kiota-authentication-azure-go/commit/5ab48d33da0a32efcbd44c75a43d8e1d4cc7e0ff))
+* upgrades common go dependency to solve triming issues ([9360b98](https://github.com/microsoft/kiota-authentication-azure-go/commit/9360b98797f0d00bc31fc3bbe17af772479da5af))
+
 ## [1.2.0](https://github.com/microsoft/kiota-authentication-azure-go/compare/v1.1.0...v1.2.0) (2025-03-13)
 
 
