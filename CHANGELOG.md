@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0](https://github.com/microsoft/kiota-authentication-azure-go/compare/v1.2.1...v1.3.0) (2025-04-02)
+
+
+### Features
+
+* add support for Continous Access Evaluation (CAE) ([e33d461](https://github.com/microsoft/kiota-authentication-azure-go/commit/e33d46169c9a88a463a20c6cee61eedcaa83099c))
+
+
+### Bug Fixes
+
+* Don't error on CAE claims ([e33d461](https://github.com/microsoft/kiota-authentication-azure-go/commit/e33d46169c9a88a463a20c6cee61eedcaa83099c))
+* removes common go dependency ([f58f8df](https://github.com/microsoft/kiota-authentication-azure-go/commit/f58f8df7ded784abbb66030eaf6b26c08c078696))
+* removes common go dependency ([b05ac0b](https://github.com/microsoft/kiota-authentication-azure-go/commit/b05ac0bb228526bc56a9d2172ffb975e7ca24f73))
+
 ## [1.2.1](https://github.com/microsoft/kiota-authentication-azure-go/compare/v1.2.0...v1.2.1) (2025-03-24)
 
 
