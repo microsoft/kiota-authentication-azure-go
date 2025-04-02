@@ -11,10 +11,12 @@ import (
 )
 
 type MockTokenCredential struct {
-	TokenValue string
+	TokenValue         string
+	LastRequestOptions policy.TokenRequestOptions
 }
 
 func (m *MockTokenCredential) GetToken(ctx context.Context, options policy.TokenRequestOptions) (azcore.AccessToken, error) {
+	m.LastRequestOptions = options
 	return azcore.AccessToken{
 		Token: m.TokenValue,
 	}, nil
@@ -75,8 +77,23 @@ func TestAddsTokenOnHttpLocalhost(t *testing.T) {
 	}
 }
 
+func TestDisablesCae(t *testing.T) {
+	mockCredential := &MockTokenCredential{TokenValue: "token"}
+	provider, err := NewAzureIdentityAccessTokenProviderWithScopesAndValidHostsAndObservabilityOptionsAndIsCaeEnabled(mockCredential, nil, nil, ObservabilityOptions{}, false)
+	assert.Nil(t, err)
+	assert.NotNil(t, provider)
+
+	url, err := u.Parse("https://graph.microsoft.com")
+	assert.Nil(t, err)
+
+	_, err = provider.GetAuthorizationToken(context.Background(), url, nil)
+	assert.NoError(t, err)
+	assert.False(t, mockCredential.LastRequestOptions.EnableCAE)
+}
+
 func TestAddsClaimsToTokenRequest(t *testing.T) {
-	provider, err := NewAzureIdentityAccessTokenProvider(&MockTokenCredential{TokenValue: "token"})
+	mockCredential := &MockTokenCredential{TokenValue: "token"}
+	provider, err := NewAzureIdentityAccessTokenProvider(mockCredential)
 	assert.Nil(t, err)
 	assert.NotNil(t, provider)
 
@@ -86,6 +103,8 @@ func TestAddsClaimsToTokenRequest(t *testing.T) {
 	additionalContext := make(map[string]interface{})
 	additionalContext["claims"] = "eyJhY2Nlc3NfdG9rZW4iOnsibmJmIjp7ImVzc2VudGlhbCI6dHJ1ZSwgInZhbHVlIjoiMTY1MjgxMzUwOCJ9fX0="
 	token, err := provider.GetAuthorizationToken(context.Background(), url, additionalContext)
-	assert.NotNil(t, err) //TODO update when azure identity has added the field
-	assert.Empty(t, token)
+	assert.NoError(t, err)
+	assert.Equal(t, "token", token)
+	assert.True(t, mockCredential.LastRequestOptions.EnableCAE)
+	assert.JSONEq(t, `{"access_token":{"nbf":{"essential":true, "value":"1652813508"}}}`, mockCredential.LastRequestOptions.Claims)
 }
