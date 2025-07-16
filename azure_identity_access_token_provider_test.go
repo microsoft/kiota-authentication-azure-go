@@ -15,6 +15,14 @@ type MockTokenCredential struct {
 	LastRequestOptions policy.TokenRequestOptions
 }
 
+func buildUrl(s string) *u.URL {
+	url, err := u.Parse(s)
+	if err != nil {
+		panic(err)
+	}
+	return url
+}
+
 func (m *MockTokenCredential) GetToken(ctx context.Context, options policy.TokenRequestOptions) (azcore.AccessToken, error) {
 	m.LastRequestOptions = options
 	return azcore.AccessToken{
@@ -75,6 +83,34 @@ func TestAddsTokenOnHttpLocalhost(t *testing.T) {
 		assert.Nil(t, err)
 		assert.Equal(t, "token", token)
 	}
+}
+
+func TestScopes(t *testing.T) {
+	t.Run("unspecified", func(t *testing.T) {
+		mockCredential := &MockTokenCredential{TokenValue: "token"}
+		provider, err := NewAzureIdentityAccessTokenProvider(mockCredential)
+		assert.Nil(t, err)
+		assert.NotNil(t, provider)
+
+		_, err = provider.GetAuthorizationToken(context.Background(), buildUrl("https://graph.microsoft.com"), nil)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"https://graph.microsoft.com/.default"}, mockCredential.LastRequestOptions.Scopes)
+
+		_, err = provider.GetAuthorizationToken(context.Background(), buildUrl("https://other.microsoft.com"), nil)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"https://other.microsoft.com/.default"}, mockCredential.LastRequestOptions.Scopes)
+	})
+
+	t.Run("specified", func(t *testing.T) {
+		mockCredential := &MockTokenCredential{TokenValue: "token"}
+		provider, err := NewAzureIdentityAccessTokenProviderWithScopes(mockCredential, []string{"foobar"})
+		assert.Nil(t, err)
+		assert.NotNil(t, provider)
+
+		_, err = provider.GetAuthorizationToken(context.Background(), buildUrl("https://graph.microsoft.com"), nil)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{"foobar"}, mockCredential.LastRequestOptions.Scopes)
+	})
 }
 
 func TestDisablesCae(t *testing.T) {
