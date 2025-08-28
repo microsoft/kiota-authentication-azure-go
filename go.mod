@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.19.0
 	github.com/microsoft/kiota-abstractions-go v1.9.3
-	github.com/stretchr/testify v1.11.0
+	github.com/stretchr/testify v1.11.1
 	go.opentelemetry.io/otel v1.37.0
 )
 
