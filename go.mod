@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.21.0
-	github.com/microsoft/kiota-abstractions-go v1.9.3
+	github.com/microsoft/kiota-abstractions-go v1.9.4
 	github.com/stretchr/testify v1.11.1
 	go.opentelemetry.io/otel v1.42.0
 )
